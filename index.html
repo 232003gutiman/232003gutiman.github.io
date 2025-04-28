@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación Completa - Proyecto Universidad MySQL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [Todos los estilos CSS anteriores se mantienen igual] */
+        /* ... */
+    </style>
+</head>
+<body>
+    <!-- [Header y navegación se mantienen igual] -->
+    <!-- ... -->
+    
+    <div class="container">
+        <aside class="sidebar">
+            <!-- [Sidebar se mantiene igual] -->
+            <!-- ... -->
+        </aside>
+        
+        <main class="content">
+            <!-- [Secciones anteriores se mantienen igual hasta Consultas Básicas] -->
+            <!-- ... -->
+
+            <section id="consultas-multitabla" class="section">
+                <h2 class="section-title"><i class="fas fa-project-diagram"></i> Consultas Multitabla</h2>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-link"></i> Composición Interna (INNER JOIN)</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Alumnas matriculadas en Ingeniería Informática
+SELECT DISTINCT p.nombre, p.apellido1, p.apellido2
+FROM persona p
+JOIN alumno_se_matricula_asignatura ama ON p.id = ama.id_alumno
+JOIN asignatura a ON ama.id_asignatura = a.id
+JOIN grado g ON a.id_grado = g.id
+WHERE p.sexo = 'M' 
+AND g.nombre = 'Grado en Ingeniería Informática (Plan 2015)';
+
+-- Profesores con sus departamentos
+SELECT p.apellido1, p.apellido2, p.nombre, d.nombre AS departamento
+FROM persona p
+JOIN profesor pr ON p.id = pr.id_profesor
+JOIN departamento d ON pr.id_departamento = d.id
+ORDER BY p.apellido1, p.apellido2, p.nombre;</code></pre>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-expand"></i> Composición Externa (LEFT/RIGHT JOIN)</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Todos los profesores (incluyendo sin departamento)
+SELECT d.nombre AS departamento, p.apellido1, p.apellido2, p.nombre
+FROM persona p
+JOIN profesor pr ON p.id = pr.id_profesor
+LEFT JOIN departamento d ON pr.id_departamento = d.id
+ORDER BY d.nombre, p.apellido1, p.apellido2, p.nombre;
+
+-- Departamentos sin profesores
+SELECT d.nombre
+FROM departamento d
+LEFT JOIN profesor p ON d.id = p.id_departamento
+WHERE p.id_profesor IS NULL;</code></pre>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-network-wired"></i> Relaciones Complejas</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Asignaturas del alumno con NIF 26902806M
+SELECT a.nombre, ce.anyo_inicio, ce.anyo_fin
+FROM persona p
+JOIN alumno_se_matricula_asignatura ama ON p.id = ama.id_alumno
+JOIN asignatura a ON ama.id_asignatura = a.id
+JOIN curso_escolar ce ON ama.id_curso_escolar = ce.id
+WHERE p.nif = '26902806M';
+
+-- Departamentos con profesores en Ingeniería Informática
+SELECT DISTINCT d.nombre
+FROM departamento d
+JOIN profesor p ON d.id = p.id_departamento
+JOIN asignatura a ON p.id_profesor = a.id_profesor
+JOIN grado g ON a.id_grado = g.id
+WHERE g.nombre = 'Grado en Ingeniería Informática (Plan 2015)';</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="consultas-resumen" class="section">
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Consultas Resumen</h2>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-calculator"></i> Agregaciones Básicas</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Número total de alumnas
+SELECT COUNT(*) AS total_alumnas
+FROM persona
+WHERE tipo = 'alumno' AND sexo = 'M';
+
+-- Alumnos nacidos en 1999
+SELECT COUNT(*) AS alumnos_1999
+FROM persona
+WHERE tipo = 'alumno' AND YEAR(fecha_nacimiento) = 1999;</code></pre>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-layer-group"></i> Agrupamientos</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Profesores por departamento (solo departamentos con profesores)
+SELECT d.nombre AS departamento, COUNT(p.id_profesor) AS num_profesores
+FROM departamento d
+JOIN profesor p ON d.id = p.id_departamento
+GROUP BY d.nombre
+ORDER BY num_profesores DESC;
+
+-- Asignaturas por grado (incluyendo grados sin asignaturas)
+SELECT g.nombre AS grado, COUNT(a.id) AS num_asignaturas
+FROM grado g
+LEFT JOIN asignatura a ON g.id = a.id_grado
+GROUP BY g.nombre
+ORDER BY num_asignaturas DESC;</code></pre>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-filter"></i> Filtros sobre Agregaciones</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Grados con más de 40 asignaturas
+SELECT g.nombre AS grado, COUNT(a.id) AS num_asignaturas
+FROM grado g
+JOIN asignatura a ON g.id = a.id_grado
+GROUP BY g.nombre
+HAVING COUNT(a.id) > 40
+ORDER BY num_asignaturas DESC;
+
+-- Alumnos matriculados por curso escolar
+SELECT ce.anyo_inicio, COUNT(DISTINCT ama.id_alumno) AS alumnos_matriculados
+FROM curso_escolar ce
+LEFT JOIN alumno_se_matricula_asignatura ama ON ce.id = ama.id_curso_escolar
+GROUP BY ce.anyo_inicio
+ORDER BY ce.anyo_inicio;</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="subconsultas" class="section">
+                <h2 class="section-title"><i class="fas fa-code-branch"></i> Subconsultas</h2>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-arrow-down"></i> Subconsultas Escalares</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Alumno más joven
+SELECT *
+FROM persona
+WHERE tipo = 'alumno' AND fecha_nacimiento = (
+    SELECT MAX(fecha_nacimiento)
+    FROM persona
+    WHERE tipo = 'alumno'
+);
+
+-- Asignaturas con más créditos que la media
+SELECT nombre, creditos
+FROM asignatura
+WHERE creditos > (
+    SELECT AVG(creditos)
+    FROM asignatura
+);</code></pre>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-list"></i> Subconsultas con IN/NOT IN</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Profesores que imparten asignaturas
+SELECT p.nombre, p.apellido1, p.apellido2
+FROM persona p
+WHERE p.id IN (
+    SELECT id_profesor
+    FROM asignatura
+    WHERE id_profesor IS NOT NULL
+);
+
+-- Asignaturas nunca impartidas
+SELECT nombre
+FROM asignatura
+WHERE id NOT IN (
+    SELECT DISTINCT id_asignatura
+    FROM alumno_se_matricula_asignatura
+);</code></pre>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-check-double"></i> Subconsultas con EXISTS/NOT EXISTS</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Departamentos con profesores que imparten asignaturas
+SELECT d.nombre
+FROM departamento d
+WHERE EXISTS (
+    SELECT 1
+    FROM profesor p
+    JOIN asignatura a ON p.id_profesor = a.id_profesor
+    WHERE p.id_departamento = d.id
+);
+
+-- Profesores sin asignaturas asignadas
+SELECT p.nombre, p.apellido1, p.apellido2
+FROM persona p
+WHERE p.tipo = 'profesor' AND NOT EXISTS (
+    SELECT 1
+    FROM asignatura a
+    WHERE a.id_profesor = p.id
+);</code></pre>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title"><i class="fas fa-table"></i> Subconsultas en FROM</h3>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">SQL</span>
+                            <button class="copy-btn">Copiar</button>
+                        </div>
+                        <pre><code>-- Profesores y número de asignaturas que imparten
+SELECT p.id, p.nombre, p.apellido1, p.apellido2, 
+       COALESCE(a.num_asignaturas, 0) AS num_asignaturas
+FROM persona p
+LEFT JOIN (
+    SELECT id_profesor, COUNT(*) AS num_asignaturas
+    FROM asignatura
+    GROUP BY id_profesor
+) a ON p.id = a.id_profesor
+WHERE p.tipo = 'profesor'
+ORDER BY num_asignaturas DESC;
+
+-- Departamentos y asignaturas no impartidas
+SELECT d.nombre AS departamento, na.asignatura
+FROM departamento d
+JOIN (
+    SELECT a.id_profesor, a.nombre AS asignatura, p.id_departamento
+    FROM asignatura a
+    JOIN profesor p ON a.id_profesor = p.id_profesor
+    WHERE a.id NOT IN (
+        SELECT id_asignatura
+        FROM alumno_se_matricula_asignatura
+    )
+) na ON d.id = na.id_departamento;</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- [El resto de las secciones se mantienen igual] -->
+            <!-- ... -->
+        </main>
+    </div>
+    
+    <!-- [Footer se mantiene igual] -->
+    <!-- ... -->
+    
+    <script>
+        // [El JavaScript anterior se mantiene igual]
+        // ...
+    </script>
+</body>
+</html>s
