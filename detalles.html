@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Proyecto - Universidad MySQL</title>
+    <link rel="stylesheet" href="pudin.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>UPJR</h1>
+            <p>UNIVERSIDAD POLITÉCNICA DE JUVENTINO ROSAS</p>
+        </div>
+        <h2>Detalles del Proyecto MySQL</h2>
+        <a href="index.html" class="btn-volver">Volver al inicio</a>
+    </header>
+
+    <main>
+        <section class="indice">
+            <h2>Índice del Proyecto</h2>
+            <ol>
+                <li><a href="#creacion">Creación de la Base de Datos</a></li>
+                <li><a href="#consultas-simples">Consultas sobre una tabla</a></li>
+                <li><a href="#consultas-multitabla">Consultas multitabla</a></li>
+                <li><a href="#consultas-resumen">Consultas resumen</a></li>
+                <li><a href="#subconsultas">Subconsultas</a></li>
+            </ol>
+        </section>
+
+        <section id="creacion" class="seccion-proyecto">
+            <h2>1. Creación de la Base de Datos</h2>
+            <p>Instrucciones SQL para crear la base de datos:</p>
+            <div class="codigo">
+                <pre><code>CREATE DATABASE universidad;
+USE universidad;
+SOURCE /ruta/del/archivo/tablas_universidad.sql;
+SOURCE /ruta/del/archivo/datos_universidad.sql;</code></pre>
+            </div>
+        </section>
+
+        <section id="consultas-simples" class="seccion-proyecto">
+            <h2>2. Consultas sobre una tabla</h2>
+            <div class="ejemplo-consulta">
+                <h3>Alumnos ordenados alfabéticamente</h3>
+                <div class="codigo">
+                    <pre><code>SELECT nombre, apellido1, apellido2
+FROM persona
+WHERE tipo = 'alumno'
+ORDER BY apellido1, apellido2, nombre;</code></pre>
+                </div>
+                <img src="assets/img/figura2-1.png" alt="Resultado de consulta">
+            </div>
+            
+            <div class="ejemplo-consulta">
+                <h3>Alumnos nacidos en 1999</h3>
+                <div class="codigo">
+                    <pre><code>SELECT nombre, apellido1, apellido2
+FROM persona
+WHERE tipo = 'alumno' AND YEAR(fecha_nacimiento) = 1999;</code></pre>
+                </div>
+                <img src="assets/img/figura2-3.png" alt="Resultado de consulta">
+            </div>
+        </section>
+
+        <section id="consultas-multitabla" class="seccion-proyecto">
+            <h2>3. Consultas multitabla</h2>
+            <div class="ejemplo-consulta">
+                <h3>Alumnas en Ingeniería Informática</h3>
+                <div class="codigo">
+                    <pre><code>SELECT DISTINCT p.nombre, p.apellido1, p.apellido2
+FROM persona p
+JOIN alumno_se_matricula_asignatura ama ON p.id = ama.id_alumno
+JOIN asignatura a ON ama.id_asignatura = a.id
+JOIN grado g ON a.id_grado = g.id
+WHERE p.sexo = 'M' AND g.nombre = 'Grado en Ingeniería Informática (Plan 2015)';</code></pre>
+                </div>
+                <img src="assets/img/figura3-1.png" alt="Resultado de consulta">
+            </div>
+        </section>
+
+        <section id="consultas-resumen" class="seccion-proyecto">
+            <h2>4. Consultas resumen</h2>
+            <div class="ejemplo-consulta">
+                <h3>Número de profesores por departamento</h3>
+                <div class="codigo">
+                    <pre><code>SELECT d.nombre AS departamento, COUNT(p.id_profesor) AS num_profesores
+FROM departamento d
+LEFT JOIN profesor p ON d.id = p.id_departamento
+GROUP BY d.nombre
+ORDER BY num_profesores DESC;</code></pre>
+                </div>
+                <img src="assets/img/figura5-3.png" alt="Resultado de consulta">
+            </div>
+        </section>
+
+        <section id="subconsultas" class="seccion-proyecto">
+            <h2>5. Subconsultas</h2>
+            <div class="ejemplo-consulta">
+                <h3>Alumno más joven</h3>
+                <div class="codigo">
+                    <pre><code>SELECT *
+FROM persona
+WHERE tipo = 'alumno' AND fecha_nacimiento = (
+    SELECT MAX(fecha_nacimiento)
+    FROM persona
+    WHERE tipo = 'alumno'
+);</code></pre>
+                </div>
+                <img src="assets/img/figura6-1.png" alt="Resultado de consulta">
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Universidad Politécnica de Juventino Rosas</p>
+    </footer>
+</body>
+</html>
